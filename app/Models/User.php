@@ -32,6 +32,11 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    public function isModerator(): bool
+    {
+        return $this->role === 'moderator';
+    }
+
     protected function casts(): array
     {
         return [

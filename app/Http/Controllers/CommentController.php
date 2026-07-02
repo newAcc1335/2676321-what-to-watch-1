@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Responses\SuccessResponse;
+use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CommentController extends Controller
 {
@@ -32,8 +34,10 @@ class CommentController extends Controller
      *
      * Endpoint: PATCH /api/comments/{comment}
      */
-    public function update(Request $request, int $commentId): SuccessResponse
+    public function update(Request $request, Comment $comment): SuccessResponse
     {
+        Gate::authorize('update-comment', $comment);
+
         return new SuccessResponse;
     }
 
@@ -42,8 +46,10 @@ class CommentController extends Controller
      *
      * Endpoint: DELETE /api/comments/{comment}
      */
-    public function destroy(int $commentId): SuccessResponse
+    public function destroy(Comment $comment): SuccessResponse
     {
+        Gate::authorize('destroy-comment', $comment);
+
         return new SuccessResponse;
     }
 }
