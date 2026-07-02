@@ -31,11 +31,6 @@ class Film extends Model
         'is_promo',
     ];
 
-    public function comments(): HasMany
-    {
-        return $this->hasMany(Comment::class);
-    }
-
     public function genres(): BelongsToMany
     {
         return $this->belongsToMany(Genre::class);
@@ -44,6 +39,18 @@ class Film extends Model
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
+    }
+
+    public function updateRating(): void
+    {
+        $this->rating = $this->comments()->whereNotNull('rating')->avg('rating');
+        $this->scores_count = $this->comments()->whereNotNull('rating')->count();
+        $this->save();
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
     }
 
     protected function casts(): array
