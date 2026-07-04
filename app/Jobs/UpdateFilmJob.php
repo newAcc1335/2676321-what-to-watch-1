@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Jobs;
+
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+use App\Models\Film;
+use App\Services\MovieService;
+
+class UpdateFilmJob implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct(private string $imdbId) {}
+
+    public function handle(MovieService $movieService): void
+    {
+        $data = $movieService->getMovieInfo($this->imdbId);
+
+        if (!$data || $data['Response'] === 'False') {
+            return;
+        }
+
+        $film = Film::where('imdb_id', $this->imdbId)->first();
+
+        if (!$film) {
+            return;
+        }
+
+        $film->update([
+            'name' => $data['Title'] ?? null,
+            'description' => $data['Plot'] ?? null,
+            'released' => isset($data['Year']) ? (int) $data['Year'] : null,
+            'run_time' => isset($data['Runtime']) ? (int) $data['Runtime'] : null,
+            'director' => isset($data['Director']) ? explode(', ', $data['Director']) : null,
+            'starring' => isset($data['Actors']) ? explode(', ', $data['Actors']) : null,
+            'status' => 'moderate',
+        ]);
+    }
+}
