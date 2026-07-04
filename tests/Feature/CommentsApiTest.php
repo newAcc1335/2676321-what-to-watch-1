@@ -33,7 +33,7 @@ class CommentsApiTest extends TestCase
                 'rating' => 8,
             ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(201);
     }
 
     public function test_guest_cannot_add_comment(): void

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Responses\SuccessResponse;
 use Illuminate\Http\Request;
+use App\Models\Film;
 
 class FavoriteController extends Controller
 {
@@ -14,7 +15,9 @@ class FavoriteController extends Controller
      */
     public function index(Request $request): SuccessResponse
     {
-        return new SuccessResponse;
+        $films = $request->user()->favoriteFilms()->latest('favorites.created_at')->get();
+
+        return new SuccessResponse($films);
     }
 
     /**
@@ -22,9 +25,17 @@ class FavoriteController extends Controller
      *
      * Endpoint: POST /api/films/{id}/favorite
      */
-    public function store(int $filmId): SuccessResponse
+    public function store(Request $request, int $filmId): SuccessResponse
     {
-        return new SuccessResponse;
+        $film = Film::findOrFail($filmId);
+
+        if ($request->user()->favoriteFilms()->where('film_id', $filmId)->exists()) {
+            abort(422, 'Фильм уже находится в избранном');
+        }
+
+        $request->user()->favoriteFilms()->attach($filmId);
+
+        return new SuccessResponse($film);
     }
 
     /**
@@ -32,8 +43,16 @@ class FavoriteController extends Controller
      *
      * Endpoint: DELETE /api/films/{id}/favorite
      */
-    public function destroy(int $filmId): SuccessResponse
+    public function destroy(Request $request, int $filmId): SuccessResponse
     {
-        return new SuccessResponse;
+        $film = Film::findOrFail($filmId);
+
+        if (!$request->user()->favoriteFilms()->where('film_id', $filmId)->exists()) {
+            abort(422, 'Фильм не находится в избранном');
+        }
+
+        $request->user()->favoriteFilms()->detach($filmId);
+
+        return new SuccessResponse($film);
     }
 }

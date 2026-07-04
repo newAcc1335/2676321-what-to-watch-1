@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Responses\SuccessResponse;
+use App\Models\Film;
 
 class PromoController extends Controller
 {
@@ -13,7 +14,9 @@ class PromoController extends Controller
      */
     public function show(): SuccessResponse
     {
-        return new SuccessResponse;
+        $film = Film::where('is_promo', true)->firstOrFail();
+
+        return new SuccessResponse($film);
     }
 
     /**
@@ -23,6 +26,10 @@ class PromoController extends Controller
      */
     public function store(int $id): SuccessResponse
     {
-        return new SuccessResponse;
+        $film = Film::findOrFail($id);
+        Film::where('is_promo', true)->update(['is_promo' => false]);
+        $film->update(['is_promo' => true]);
+
+        return new SuccessResponse($film);
     }
 }

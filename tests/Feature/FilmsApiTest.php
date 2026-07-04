@@ -20,8 +20,10 @@ class FilmsApiTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'name', 'preview_image'],
-            ],
+                'data' => [
+                    '*' => ['id', 'name', 'preview_image']
+                ]
+            ]
         ]);
     }
 

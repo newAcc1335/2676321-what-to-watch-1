@@ -6,6 +6,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Responses\SuccessResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -16,7 +17,29 @@ class AuthController extends Controller
      */
     public function register(Request $request): SuccessResponse
     {
-        return new SuccessResponse;
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8',
+            'file' => 'nullable|image|max:10240',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password,
+        ]);
+
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('avatars', 'public');
+            $user->update(['avatar' => $path]);
+        }
+
+        $token = $user->createToken('auth-token');
+
+        return new SuccessResponse([
+            'token' => $token->plainTextToken,
+        ], 201);
     }
 
     /**

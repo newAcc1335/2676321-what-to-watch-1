@@ -6,6 +6,7 @@ use App\Http\Responses\SuccessResponse;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Film;
 
 class CommentController extends Controller
 {
@@ -16,7 +17,23 @@ class CommentController extends Controller
      */
     public function index(int $filmId): SuccessResponse
     {
-        return new SuccessResponse;
+        $film = Film::findOrFail($filmId);
+
+        $comments = $film->comments()
+            ->with('user')
+            ->latest()
+            ->get()
+            ->map(function (Comment $comment) {
+                return [
+                    'id' => $comment->id,
+                    'text' => $comment->text,
+                    'author_name' => $comment->author_name,
+                    'rating' => $comment->rating,
+                    'created_at' => $comment->created_at,
+                ];
+            });
+
+        return new SuccessResponse($comments);
     }
 
     /**
@@ -26,7 +43,24 @@ class CommentController extends Controller
      */
     public function store(Request $request, int $filmId): SuccessResponse
     {
-        return new SuccessResponse;
+        $film = Film::findOrFail($filmId);
+
+        $request->validate([
+            'text' => 'required|string|min:50|max:400',
+            'rating' => 'required|integer|min:1|max:10',
+            'comment_id' => 'nullable|exists:comments,id',
+        ]);
+
+        $comment = $film->comments()->create([
+            'user_id' => $request->user()->id,
+            'text' => $request->text,
+            'rating' => $request->rating,
+            'comment_id' => $request->comment_id,
+        ]);
+
+        $film->updateRating();
+
+        return new SuccessResponse($comment, 201);
     }
 
     /**
@@ -38,7 +72,15 @@ class CommentController extends Controller
     {
         Gate::authorize('update-comment', $comment);
 
-        return new SuccessResponse;
+        $request->validate([
+            'text' => 'required|string|min:50|max:400',
+            'rating' => 'nullable|integer|min:1|max:10',
+        ]);
+
+        $comment->update($request->only(['text', 'rating']));
+        $comment->film->updateRating();
+
+        return new SuccessResponse($comment);
     }
 
     /**
@@ -50,6 +92,10 @@ class CommentController extends Controller
     {
         Gate::authorize('destroy-comment', $comment);
 
-        return new SuccessResponse;
+        $film = $comment->film;
+        $comment->delete();
+        $film->updateRating();
+
+        return new SuccessResponse();
     }
 }

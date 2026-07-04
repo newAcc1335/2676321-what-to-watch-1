@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Responses\SuccessResponse;
 use Illuminate\Http\Request;
+use App\Models\Genre;
 
 class GenreController extends Controller
 {
@@ -14,7 +15,7 @@ class GenreController extends Controller
      */
     public function index(): SuccessResponse
     {
-        return new SuccessResponse;
+        return new SuccessResponse(Genre::all());
     }
 
     /**
@@ -22,8 +23,14 @@ class GenreController extends Controller
      *
      * Endpoint: PATCH /api/genres/{genre}
      */
-    public function update(Request $request, int $genreId): SuccessResponse
+    public function update(Request $request, Genre $genre): SuccessResponse
     {
-        return new SuccessResponse;
+        $request->validate([
+            'name' => 'required|string|unique:genres,name,' . $genre->id,
+        ]);
+
+        $genre->update(['name' => $request->name]);
+
+        return new SuccessResponse($genre);
     }
 }

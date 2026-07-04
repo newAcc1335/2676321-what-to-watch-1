@@ -14,7 +14,7 @@ class UserController extends Controller
      */
     public function show(Request $request): SuccessResponse
     {
-        return new SuccessResponse;
+        return new SuccessResponse($request->user());
     }
 
     /**
@@ -24,6 +24,21 @@ class UserController extends Controller
      */
     public function update(Request $request): SuccessResponse
     {
-        return new SuccessResponse;
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $request->user()->id,
+            'password' => 'sometimes|string|min:8',
+        ]);
+
+        $user = $request->user();
+
+        $user->update($request->only(['name', 'email', 'password']));
+
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('avatars', 'public');
+            $user->update(['avatar' => $path]);
+        }
+
+        return new SuccessResponse($user);
     }
 }
