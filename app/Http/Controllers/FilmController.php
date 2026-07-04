@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Responses\SuccessResponse;
-use Illuminate\Http\Request;
 use App\Jobs\UpdateFilmJob;
 use App\Models\Film;
+use Illuminate\Http\Request;
 
 class FilmController extends Controller
 {
@@ -49,6 +49,7 @@ class FilmController extends Controller
 
         return new SuccessResponse($film, 201);
     }
+
     /**
      * Редактирование фильма.
      *

@@ -2,10 +2,10 @@
 
 namespace App\Jobs;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 use App\Models\Film;
 use App\Services\MovieService;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
 
 class UpdateFilmJob implements ShouldQueue
 {
@@ -17,13 +17,13 @@ class UpdateFilmJob implements ShouldQueue
     {
         $data = $movieService->getMovieInfo($this->imdbId);
 
-        if (!$data || $data['Response'] === 'False') {
+        if (! $data || $data['Response'] === 'False') {
             return;
         }
 
         $film = Film::where('imdb_id', $this->imdbId)->first();
 
-        if (!$film) {
+        if (! $film) {
             return;
         }
 
