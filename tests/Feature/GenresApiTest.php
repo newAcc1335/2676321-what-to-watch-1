@@ -20,8 +20,8 @@ class GenresApiTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'name']
-            ]
+                '*' => ['id', 'name'],
+            ],
         ]);
     }
 

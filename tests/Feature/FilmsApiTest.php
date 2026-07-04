@@ -20,8 +20,8 @@ class FilmsApiTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'name', 'preview_image']
-            ]
+                '*' => ['id', 'name', 'preview_image'],
+            ],
         ]);
     }
 
@@ -32,7 +32,7 @@ class FilmsApiTest extends TestCase
         $response = $this->actingAs($moderator)
             ->postJson('/api/films', ['imdb_id' => 'tt1234567']);
 
-        $response->assertStatus(200);
+        $response->assertStatus(201);
     }
 
     public function test_user_cannot_add_film(): void
