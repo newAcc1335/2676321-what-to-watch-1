@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Contracts\MovieRepositoryInterface;
 use App\Models\Comment;
 use App\Models\User;
+use App\Repositories\OmdbRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -14,7 +16,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(MovieRepositoryInterface::class, function () {
+            $client = \Http\Adapter\Guzzle7\Client::createWithConfig([]);
+            $requestFactory = new \GuzzleHttp\Psr7\HttpFactory();
+
+            return new OmdbRepository(
+                $client,
+                $requestFactory,
+                config('services.omdb.key')
+            );
+        });
     }
 
     /**

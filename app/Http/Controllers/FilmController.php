@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Responses\SuccessResponse;
 use Illuminate\Http\Request;
+use App\Jobs\UpdateFilmJob;
+use App\Models\Film;
 
 class FilmController extends Controller
 {
@@ -34,9 +36,19 @@ class FilmController extends Controller
      */
     public function store(Request $request): SuccessResponse
     {
-        return new SuccessResponse;
-    }
+        $request->validate([
+            'imdb_id' => 'required|unique:films,imdb_id|regex:/^tt\d+$/',
+        ]);
 
+        $film = Film::create([
+            'imdb_id' => $request->imdb_id,
+            'status' => 'pending',
+        ]);
+
+        UpdateFilmJob::dispatch($film->imdb_id);
+
+        return new SuccessResponse($film, 201);
+    }
     /**
      * Редактирование фильма.
      *
