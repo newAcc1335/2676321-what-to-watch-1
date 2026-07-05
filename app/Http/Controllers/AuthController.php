@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Responses\SuccessResponse;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -69,6 +69,6 @@ class AuthController extends Controller
     {
         $request->user()->tokens()->delete();
 
-        return new SuccessResponse;
+        return new SuccessResponse();
     }
 }

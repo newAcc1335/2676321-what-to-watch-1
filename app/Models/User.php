@@ -15,7 +15,9 @@ use Laravel\Sanctum\HasApiTokens;
 #[Hidden(['password'])]
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens;
+    use HasFactory;
+    use Notifiable;
 
     public function favorites(): HasMany
     {
@@ -37,6 +39,7 @@ class User extends Authenticatable
         return $this->role === 'moderator';
     }
 
+    #[\Override]
     protected function casts(): array
     {
         return [

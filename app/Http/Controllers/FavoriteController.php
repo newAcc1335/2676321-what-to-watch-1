@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Responses\SuccessResponse;
-use Illuminate\Http\Request;
 use App\Models\Film;
+use Illuminate\Http\Request;
 
 class FavoriteController extends Controller
 {
@@ -47,7 +47,7 @@ class FavoriteController extends Controller
     {
         $film = Film::findOrFail($filmId);
 
-        if (!$request->user()->favoriteFilms()->where('film_id', $filmId)->exists()) {
+        if (! $request->user()->favoriteFilms()->where('film_id', $filmId)->exists()) {
             abort(422, 'Фильм не находится в избранном');
         }
 

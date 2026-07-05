@@ -1,0 +1,77 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+
+class UserApiTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_authenticated_user_can_get_profile(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->getJson('/api/user');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => ['id', 'name', 'email']
+        ]);
+    }
+
+    public function test_guest_cannot_get_profile(): void
+    {
+        $response = $this->getJson('/api/user');
+
+        $response->assertStatus(401);
+    }
+
+    public function test_authenticated_user_can_update_profile(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->patchJson('/api/user', [
+                'name' => 'John Snow',
+                'email' => $user->email,
+            ]);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_user_can_update_avatar(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create();
+        $file = UploadedFile::fake()->image('avatar.jpg');
+
+        $response = $this->actingAs($user)
+            ->patchJson('/api/user', [
+                'name' => $user->name,
+                'email' => $user->email,
+                'file' => $file,
+            ]);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_user_cannot_update_profile_with_existing_email(): void
+    {
+        $user = User::factory()->create();
+        $newUser = User::factory()->create(['email' => 'user2@test.ru']);
+
+        $response = $this->actingAs($user)
+            ->patchJson('/api/user', [
+                'name' => 'New User',
+                'email' => $newUser->email,
+            ]);
+
+        $response->assertStatus(422);
+    }
+}

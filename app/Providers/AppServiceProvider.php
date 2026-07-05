@@ -16,11 +16,12 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
+    #[\Override]
     public function register(): void
     {
         $this->app->bind(MovieRepositoryInterface::class, function () {
             $client = Client::createWithConfig([]);
-            $requestFactory = new HttpFactory;
+            $requestFactory = new HttpFactory();
 
             return new OmdbRepository(
                 $client,

@@ -33,7 +33,7 @@ class Comment extends Model
         return $this->hasMany(Comment::class, 'comment_id');
     }
 
-    public function getAuthorNameAttribute(): string
+    protected function getAuthorNameAttribute(): string
     {
         return $this->user?->name ?? 'incognito';
     }

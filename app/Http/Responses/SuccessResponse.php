@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 class SuccessResponse extends BaseResponse
 {
     public function __construct(
-        array|Arrayable $data = [],
+        mixed $data = [],
         int $statusCode = Response::HTTP_OK,
     ) {
         parent::__construct($data, $statusCode);
@@ -17,6 +17,7 @@ class SuccessResponse extends BaseResponse
     /**
      * Формируем ответ согласно формату API.
      */
+    #[\Override]
     protected function payload(): ?array
     {
         return [

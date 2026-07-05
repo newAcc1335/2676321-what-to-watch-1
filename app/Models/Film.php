@@ -53,6 +53,7 @@ class Film extends Model
         return $this->hasMany(Comment::class);
     }
 
+    #[\Override]
     protected function casts(): array
     {
         return [

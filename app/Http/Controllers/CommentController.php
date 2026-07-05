@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Responses\SuccessResponse;
 use App\Models\Comment;
+use App\Models\Film;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use App\Models\Film;
 
 class CommentController extends Controller
 {

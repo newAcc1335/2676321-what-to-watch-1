@@ -10,17 +10,24 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class BaseResponse implements Responsable
 {
     public function __construct(
-        protected array|Arrayable $data = [],
+        protected mixed $data = [],
         public int $statusCode = Response::HTTP_OK,
-    ) {}
+    ) {
+    }
 
     /**
      * Формирует JSON-ответ для клиента.
      */
+    #[\Override]
     public function toResponse($request): JsonResponse
     {
         return response()->json($this->payload(), $this->statusCode);
     }
+
+    /**
+     * Формирует содержимое ответа.
+     */
+    abstract protected function payload(): ?array;
 
     /**
      * Преобразует данные к массиву.
@@ -31,11 +38,10 @@ abstract class BaseResponse implements Responsable
             return $this->data->toArray();
         }
 
-        return $this->data;
-    }
+        if (is_array($this->data)) {
+            return $this->data;
+        }
 
-    /**
-     * Формирует содержимое ответа.
-     */
-    abstract protected function payload(): ?array;
+        return [];
+    }
 }

@@ -17,6 +17,7 @@ class ErrorResponse extends BaseResponse
     /**
      * Возвращает сообщение об ошибке и список ошибок.
      */
+    #[\Override]
     protected function payload(): ?array
     {
         return [

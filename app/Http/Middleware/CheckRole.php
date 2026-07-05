@@ -15,7 +15,7 @@ class CheckRole
     public function handle(Request $request, Closure $next, string $role): mixed
     {
         if (! Auth::check() || ! Auth::user()->$role()) {
-            throw new AuthorizationException;
+            throw new AuthorizationException();
         }
 
         return $next($request);

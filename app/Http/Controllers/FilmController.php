@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Responses\SuccessResponse;
 use App\Jobs\UpdateFilmJob;
 use App\Models\Film;
+use App\Models\Genre;
 use Illuminate\Http\Request;
 
 class FilmController extends Controller
@@ -19,7 +20,7 @@ class FilmController extends Controller
         $query = Film::query()->where('status', 'ready');
 
         if ($request->has('genre')) {
-            $query->whereHas('genres', fn($q) => $q->where('name', $request->genre));
+            $query->whereHas('genres', fn ($q) => $q->where('name', $request->genre));
         }
 
         $orderBy = $request->get('order_by', 'released');
@@ -97,8 +98,8 @@ class FilmController extends Controller
 
         if ($request->has('genre')) {
             $genreIds = collect($request->genre)->map(function ($name) {
-                return \App\Models\Genre::firstOrCreate(['name' => $name])->id;
-            });
+                return Genre::firstOrCreate(['name' => $name])->id;
+            })->toArray();
             $film->genres()->sync($genreIds);
         }
 
@@ -118,7 +119,7 @@ class FilmController extends Controller
 
         $similar = Film::where('id', '!=', $filmId)
             ->where('status', 'ready')
-            ->whereHas('genres', fn($q) => $q->whereIn('genres.id', $genreIds))
+            ->whereHas('genres', fn ($q) => $q->whereIn('genres.id', $genreIds))
             ->limit(4)
             ->get();
 

@@ -11,7 +11,9 @@ class UpdateFilmJob implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(private string $imdbId) {}
+    public function __construct(private string $imdbId)
+    {
+    }
 
     public function handle(MovieService $movieService): void
     {

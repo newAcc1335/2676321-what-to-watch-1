@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Responses\SuccessResponse;
-use Illuminate\Http\Request;
 use App\Models\Genre;
+use Illuminate\Http\Request;
 
 class GenreController extends Controller
 {
