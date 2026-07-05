@@ -45,5 +45,6 @@ class GenresApiTest extends TestCase
             ->patchJson("/api/genres/{$genre->id}", ['name' => 'New Name']);
 
         $response->assertStatus(403);
+        $response->assertJsonStructure(['message']);
     }
 }

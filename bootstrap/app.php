@@ -22,4 +22,24 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
+
+        $exceptions->render(function (\Illuminate\Validation\ValidationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return new \App\Http\Responses\ErrorResponse(
+                    'Переданные данные не корректны.',
+                    $e->errors(),
+                    422
+                );
+            }
+        });
+
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return new \App\Http\Responses\ErrorResponse(
+                    $e->getMessage(),
+                    [],
+                    $e->getStatusCode()
+                );
+            }
+        });
     })->create();

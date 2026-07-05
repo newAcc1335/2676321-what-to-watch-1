@@ -28,6 +28,7 @@ class PromoApiTest extends TestCase
         $response = $this->getJson('/api/promo');
 
         $response->assertStatus(404);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_moderator_can_set_promo_film(): void
@@ -52,6 +53,7 @@ class PromoApiTest extends TestCase
         $response = $this->actingAs($user)->postJson("/api/promo/{$film->id}");
 
         $response->assertStatus(403);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_only_one_film_can_be_promo(): void

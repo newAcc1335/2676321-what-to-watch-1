@@ -2,7 +2,6 @@
 
 namespace App\Http\Responses;
 
-use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\Response;
 
 class SuccessResponse extends BaseResponse

@@ -13,26 +13,31 @@ class Comment extends Model
 
     protected $fillable = ['film_id', 'user_id', 'comment_id', 'text', 'rating'];
 
+    /** Фильм к которому относится комментарий */
     public function film(): BelongsTo
     {
         return $this->belongsTo(Film::class);
     }
 
+    /** Автор комментария */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** Родительский комментарий */
     public function parentComment(): BelongsTo
     {
         return $this->belongsTo(Comment::class, 'comment_id');
     }
 
+    /** Ответы на этот комментарий */
     public function childComments(): HasMany
     {
         return $this->hasMany(Comment::class, 'comment_id');
     }
 
+    /** Возвращает имя автора или 'incognito' для анонимных комментариев */
     protected function getAuthorNameAttribute(): string
     {
         return $this->user?->name ?? 'incognito';

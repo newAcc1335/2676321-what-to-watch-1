@@ -7,10 +7,12 @@ use App\Jobs\UpdateFilmJob;
 use App\Models\Film;
 use App\Services\GenreService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use App\Rules\ImdbIdRule;
 
 class FilmController extends Controller
 {
-    public function __construct(private GenreService $genreService)
+    public function __construct(private readonly GenreService $genreService)
     {
     }
 
@@ -21,18 +23,26 @@ class FilmController extends Controller
      */
     public function index(Request $request): SuccessResponse
     {
-        $query = Film::query()->where('status', 'ready');
+        $genre = $request->input('genre');
+        $orderBy = $request->input('order_by', 'released');
+        $orderTo = $request->input('order_to', 'desc');
+        $page = $request->input('page', 1);
 
-        if ($request->has('genre')) {
-            $query->whereHas('genres', fn ($q) => $q->where('name', $request->genre));
-        }
+        $cacheKey = "films_{$genre}_{$orderBy}_{$orderTo}_{$page}";
 
-        $orderBy = $request->get('order_by', 'released');
-        $orderTo = $request->get('order_to', 'desc');
+        $films = Cache::remember($cacheKey, 3600, function () use ($genre, $orderBy, $orderTo) {
+            $query = Film::query()->where('status', 'ready');
 
-        $query->orderBy($orderBy, $orderTo);
+            if ($genre) {
+                $query->whereHas('genres', fn ($q) => $q->where('name', $genre));
+            }
 
-        return new SuccessResponse($query->paginate(8));
+            $query->orderBy($orderBy, $orderTo);
+
+            return $query->paginate(8);
+        });
+
+        return new SuccessResponse($films);
     }
 
     /**
@@ -64,7 +74,7 @@ class FilmController extends Controller
     public function store(Request $request): SuccessResponse
     {
         $request->validate([
-            'imdb_id' => 'required|unique:films,imdb_id|regex:/^tt\d+$/',
+            'imdb_id' => ['required', 'unique:films,imdb_id', new ImdbIdRule()],
         ]);
 
         $film = Film::create([

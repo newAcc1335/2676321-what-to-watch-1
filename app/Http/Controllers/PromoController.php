@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Responses\SuccessResponse;
 use App\Models\Film;
+use Illuminate\Support\Facades\Cache;
 
 class PromoController extends Controller
 {
@@ -14,7 +15,9 @@ class PromoController extends Controller
      */
     public function show(): SuccessResponse
     {
-        $film = Film::where('is_promo', true)->firstOrFail();
+        $film = Cache::remember('promo_film', 3600, function () {
+            return Film::where('is_promo', true)->firstOrFail();
+        });
 
         return new SuccessResponse($film);
     }
@@ -29,6 +32,8 @@ class PromoController extends Controller
         $film = Film::findOrFail($id);
         Film::where('is_promo', true)->update(['is_promo' => false]);
         $film->update(['is_promo' => true]);
+
+        Cache::forget('promo_film');
 
         return new SuccessResponse($film);
     }

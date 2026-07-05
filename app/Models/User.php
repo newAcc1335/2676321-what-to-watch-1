@@ -19,21 +19,19 @@ class User extends Authenticatable
     use HasFactory;
     use Notifiable;
 
-    public function favorites(): HasMany
-    {
-        return $this->hasMany(Favorite::class);
-    }
-
+    /** Фильмы в списке «К просмотру» */
     public function favoriteFilms(): BelongsToMany
     {
         return $this->belongsToMany(Film::class, 'favorites')->withTimestamps();
     }
 
+    /** Комментарии пользователя */
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
+    /** Проверяет, является ли пользователь модератором */
     public function isModerator(): bool
     {
         return $this->role === 'moderator';

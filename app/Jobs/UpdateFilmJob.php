@@ -11,10 +11,16 @@ class UpdateFilmJob implements ShouldQueue
 {
     use Queueable;
 
+    /**
+     * @param string $imdbId IMDB идентификатор фильма
+     */
     public function __construct(private string $imdbId)
     {
     }
 
+    /**
+     * Загружает данные о фильме из внешнего источника и обновляет запись в БД
+     */
     public function handle(MovieService $movieService): void
     {
         $data = $movieService->getMovieInfo($this->imdbId);

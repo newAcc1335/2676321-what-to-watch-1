@@ -46,6 +46,7 @@ class FilmsApiTest extends TestCase
             ->postJson('/api/films', ['imdb_id' => 'tt1234567']);
 
         $response->assertStatus(403);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_anyone_can_get_film(): void
@@ -65,6 +66,7 @@ class FilmsApiTest extends TestCase
         $response = $this->getJson('/api/films/999');
 
         $response->assertStatus(404);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_authenticated_user_gets_is_favorite_field(): void
@@ -130,5 +132,6 @@ class FilmsApiTest extends TestCase
             ->patchJson("/api/films/{$film->id}", ['name' => 'New Name']);
 
         $response->assertStatus(403);
+        $response->assertJsonStructure(['message']);
     }
 }

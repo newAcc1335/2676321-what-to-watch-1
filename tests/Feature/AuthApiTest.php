@@ -35,6 +35,7 @@ class AuthApiTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertJsonStructure(['message', 'errors' => ['email']]);
     }
 
     public function test_user_can_login(): void
@@ -68,6 +69,7 @@ class AuthApiTest extends TestCase
         ]);
 
         $response->assertStatus(401);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_user_cannot_login_with_wrong_email(): void
@@ -78,6 +80,7 @@ class AuthApiTest extends TestCase
         ]);
 
         $response->assertStatus(401);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_user_can_logout(): void
@@ -94,5 +97,6 @@ class AuthApiTest extends TestCase
         $response = $this->postJson('/api/logout');
 
         $response->assertStatus(401);
+        $response->assertJsonStructure(['message']);
     }
 }

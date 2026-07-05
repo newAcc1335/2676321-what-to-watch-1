@@ -29,6 +29,7 @@ class UserApiTest extends TestCase
         $response = $this->getJson('/api/user');
 
         $response->assertStatus(401);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_authenticated_user_can_update_profile(): void
@@ -73,5 +74,6 @@ class UserApiTest extends TestCase
             ]);
 
         $response->assertStatus(422);
+        $response->assertJsonStructure(['message', 'errors' => ['email']]);
     }
 }

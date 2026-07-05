@@ -30,6 +30,7 @@ class FavoritesApiTest extends TestCase
         $response = $this->getJson('/api/favorite');
 
         $response->assertStatus(401);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_user_can_add_film_to_favorites(): void
@@ -55,6 +56,7 @@ class FavoritesApiTest extends TestCase
         $response = $this->actingAs($user)->postJson("/api/films/{$film->id}/favorite");
 
         $response->assertStatus(422);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_user_can_remove_film_from_favorites(): void
@@ -80,6 +82,7 @@ class FavoritesApiTest extends TestCase
         $response = $this->actingAs($user)->deleteJson("/api/films/{$film->id}/favorite");
 
         $response->assertStatus(422);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_guest_cannot_add_to_favorites(): void
@@ -89,5 +92,6 @@ class FavoritesApiTest extends TestCase
         $response = $this->postJson("/api/films/{$film->id}/favorite");
 
         $response->assertStatus(401);
+        $response->assertJsonStructure(['message']);
     }
 }

@@ -48,6 +48,7 @@ class CommentsApiTest extends TestCase
             ]);
 
         $response->assertStatus(422);
+        $response->assertJsonStructure(['message', 'errors' => ['text']]);
     }
 
     public function test_guest_cannot_add_comment(): void
@@ -60,6 +61,7 @@ class CommentsApiTest extends TestCase
         ]);
 
         $response->assertStatus(401);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_user_cannot_delete_others_comment(): void
@@ -71,6 +73,7 @@ class CommentsApiTest extends TestCase
             ->deleteJson("/api/comments/{$comment->id}");
 
         $response->assertStatus(403);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_user_can_update_own_comment(): void
@@ -99,6 +102,7 @@ class CommentsApiTest extends TestCase
             ]);
 
         $response->assertStatus(403);
+        $response->assertJsonStructure(['message']);
     }
 
     public function test_user_can_delete_own_comment(): void

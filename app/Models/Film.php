@@ -31,16 +31,19 @@ class Film extends Model
         'is_promo',
     ];
 
+    /** Жанры фильма */
     public function genres(): BelongsToMany
     {
         return $this->belongsToMany(Genre::class);
     }
 
+    /** Записи в избранном */
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
     }
 
+    /** Пересчитывает рейтинг фильма на основе оценок в комментариях */
     public function updateRating(): void
     {
         $this->rating = $this->comments()->whereNotNull('rating')->avg('rating');
@@ -48,6 +51,7 @@ class Film extends Model
         $this->save();
     }
 
+    /** Комментарии к фильму */
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
