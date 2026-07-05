@@ -12,7 +12,7 @@ class UpdateFilmJob implements ShouldQueue
     use Queueable;
 
     /**
-     * @param string $imdbId IMDB идентификатор фильма
+     * @param  string  $imdbId  IMDB идентификатор фильма
      */
     public function __construct(private string $imdbId)
     {

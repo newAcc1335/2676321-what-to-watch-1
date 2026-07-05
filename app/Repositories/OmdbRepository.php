@@ -21,8 +21,9 @@ class OmdbRepository implements MovieRepositoryInterface
     /**
      * Возвращает данные о фильме из OMDb API по IMDB ID.
      *
-     * @param string $imdbId IMDB идентификатор фильма
+     * @param  string  $imdbId  IMDB идентификатор фильма
      * @return array|null данные о фильме или null если не найден
+     *
      * @throws ClientExceptionInterface
      */
     #[\Override]

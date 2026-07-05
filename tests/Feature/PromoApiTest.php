@@ -19,7 +19,7 @@ class PromoApiTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'data' => ['id', 'name', 'is_promo']
+            'data' => ['id', 'name', 'is_promo'],
         ]);
     }
 

@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Responses\SuccessResponse;
 use App\Jobs\UpdateFilmJob;
 use App\Models\Film;
+use App\Rules\ImdbIdRule;
 use App\Services\GenreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use App\Rules\ImdbIdRule;
 
 class FilmController extends Controller
 {

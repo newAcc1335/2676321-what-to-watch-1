@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Film;
+use App\Models\Genre;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\Genre;
 
 class FilmsApiTest extends TestCase
 {
@@ -57,7 +57,7 @@ class FilmsApiTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'data' => ['id', 'name', 'imdb_id', 'status']
+            'data' => ['id', 'name', 'imdb_id', 'status'],
         ]);
     }
 
@@ -79,7 +79,7 @@ class FilmsApiTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'data' => ['id', 'name', 'is_favorite']
+            'data' => ['id', 'name', 'is_favorite'],
         ]);
     }
 
@@ -133,5 +133,40 @@ class FilmsApiTest extends TestCase
 
         $response->assertStatus(403);
         $response->assertJsonStructure(['message']);
+    }
+
+    public function test_similar_films_returns_max_4(): void
+    {
+        $genre = Genre::factory()->create();
+        $film = Film::factory()->hasAttached($genre)->create(['status' => 'ready']);
+        Film::factory()->hasAttached($genre)->count(10)->create(['status' => 'ready']);
+
+        $response = $this->getJson("/api/films/{$film->id}/similar");
+
+        $response->assertStatus(200);
+        $this->assertLessThanOrEqual(4, count($response->json('data')));
+    }
+
+    public function test_similar_films_returns_404_for_nonexistent(): void
+    {
+        $response = $this->getJson('/api/films/999999/similar');
+
+        $response->assertStatus(404);
+        $response->assertJsonStructure(['message']);
+    }
+
+    public function test_similar_films_only_same_genre(): void
+    {
+        $genre = Genre::factory()->create();
+        $otherGenre = Genre::factory()->create();
+
+        $film = Film::factory()->hasAttached($genre)->create(['status' => 'ready']);
+        Film::factory()->hasAttached($genre)->count(3)->create(['status' => 'ready']);
+        $otherFilm = Film::factory()->hasAttached($otherGenre)->create(['status' => 'ready']);
+
+        $response = $this->getJson("/api/films/{$film->id}/similar");
+
+        $ids = collect($response->json('data'))->pluck('id');
+        $this->assertNotContains($otherFilm->id, $ids);
     }
 }

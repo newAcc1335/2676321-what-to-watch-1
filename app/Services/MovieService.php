@@ -13,7 +13,7 @@ class MovieService
     /**
      * Возвращает информацию о фильме по IMDB ID.
      *
-     * @param string $imdbId IMDB идентификатор фильма
+     * @param  string  $imdbId  IMDB идентификатор фильма
      * @return array|null данные о фильме или null если не найден
      */
     public function getMovieInfo(string $imdbId): ?array

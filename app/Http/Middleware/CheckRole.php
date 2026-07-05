@@ -12,7 +12,8 @@ class CheckRole
     /**
      * Проверяет наличие роли у пользователя перед допуском к роуту.
      *
-     * @param string $role название метода модели User для проверки роли
+     * @param  string  $role  название метода модели User для проверки роли
+     *
      * @throws AuthorizationException
      */
     public function handle(Request $request, Closure $next, string $role): mixed

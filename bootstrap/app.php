@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Middleware\CheckRole;
+use App\Http\Responses\ErrorResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -23,9 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*'),
         );
 
-        $exceptions->render(function (\Illuminate\Validation\ValidationException $e, Request $request) {
+        $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*')) {
-                return new \App\Http\Responses\ErrorResponse(
+                return new ErrorResponse(
                     'Переданные данные не корректны.',
                     $e->errors(),
                     422
@@ -33,9 +36,9 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, Request $request) {
+        $exceptions->render(function (HttpException $e, Request $request) {
             if ($request->is('api/*')) {
-                return new \App\Http\Responses\ErrorResponse(
+                return new ErrorResponse(
                     $e->getMessage(),
                     [],
                     $e->getStatusCode()

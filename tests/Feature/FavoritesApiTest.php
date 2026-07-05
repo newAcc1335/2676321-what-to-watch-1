@@ -21,7 +21,7 @@ class FavoritesApiTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'data' => [['id', 'name']]
+            'data' => [['id', 'name']],
         ]);
     }
 
@@ -93,5 +93,15 @@ class FavoritesApiTest extends TestCase
 
         $response->assertStatus(401);
         $response->assertJsonStructure(['message']);
+    }
+
+    public function test_empty_favorites_returns_empty_list(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->getJson('/api/favorite');
+
+        $response->assertStatus(200);
+        $response->assertJsonCount(0, 'data');
     }
 }

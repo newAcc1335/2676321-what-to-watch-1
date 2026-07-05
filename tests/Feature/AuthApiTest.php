@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\User;
 
 class AuthApiTest extends TestCase
 {
@@ -20,7 +20,7 @@ class AuthApiTest extends TestCase
 
         $response->assertStatus(201);
         $response->assertJsonStructure([
-            'data' => ['token']
+            'data' => ['token'],
         ]);
     }
 
@@ -52,7 +52,7 @@ class AuthApiTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'data' => ['token']
+            'data' => ['token'],
         ]);
     }
 
@@ -98,5 +98,17 @@ class AuthApiTest extends TestCase
 
         $response->assertStatus(401);
         $response->assertJsonStructure(['message']);
+    }
+
+    public function test_tokens_deleted_after_logout(): void
+    {
+        $user = User::factory()->create();
+        $user->createToken('auth-token');
+
+        $this->assertEquals(1, $user->tokens()->count());
+
+        $this->actingAs($user)->postJson('/api/logout');
+
+        $this->assertEquals(0, $user->fresh()->tokens()->count());
     }
 }
