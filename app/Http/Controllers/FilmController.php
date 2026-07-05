@@ -5,11 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Responses\SuccessResponse;
 use App\Jobs\UpdateFilmJob;
 use App\Models\Film;
-use App\Models\Genre;
+use App\Services\GenreService;
 use Illuminate\Http\Request;
 
 class FilmController extends Controller
 {
+    public function __construct(private GenreService $genreService)
+    {
+    }
+
     /**
      * Получение списка фильмов с пагинацией и фильтрацией.
      *
@@ -97,9 +101,7 @@ class FilmController extends Controller
         $film->update($request->except('genre'));
 
         if ($request->has('genre')) {
-            $genreIds = collect($request->genre)->map(function ($name) {
-                return Genre::firstOrCreate(['name' => $name])->id;
-            })->toArray();
+            $genreIds = $this->genreService->findOrCreateByNames($request->input('genre', []));
             $film->genres()->sync($genreIds);
         }
 
