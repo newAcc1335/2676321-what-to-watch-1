@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\UpdateFilmJob;
 use App\Models\Film;
 use App\Models\Genre;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use App\Jobs\UpdateFilmJob;
 use Illuminate\Support\Facades\Queue;
+use Tests\TestCase;
 
 class FilmsApiTest extends TestCase
 {

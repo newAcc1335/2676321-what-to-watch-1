@@ -13,12 +13,10 @@ final class CommentController extends Controller
     /**
      * Получение списка комментариев к данному фильму.
      *
-     * Endpoint: GET /api/comments/{id}
+     * Endpoint: GET /api/comments/{film}
      */
-    public function index(int $filmId): SuccessResponse
+    public function index(Film $film): SuccessResponse
     {
-        $film = Film::findOrFail($filmId);
-
         $comments = $film->comments()
             ->with('user')
             ->latest()
@@ -39,12 +37,10 @@ final class CommentController extends Controller
     /**
      * Добавление комментария к данному фильму.
      *
-     * Endpoint: POST /api/comments/{id}
+     * Endpoint: POST /api/comments/{film}
      */
-    public function store(Request $request, int $filmId): SuccessResponse
+    public function store(Request $request, Film $film): SuccessResponse
     {
-        $film = Film::findOrFail($filmId);
-
         $request->validate([
             'text' => 'required|string|min:50|max:400',
             'rating' => 'required|integer|min:1|max:10',

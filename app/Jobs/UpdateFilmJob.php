@@ -3,10 +3,10 @@
 namespace App\Jobs;
 
 use App\Models\Film;
+use App\Services\GenreService;
 use App\Services\MovieService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use App\Services\GenreService;
 use Illuminate\Queue\Middleware\RateLimited;
 
 final class UpdateFilmJob implements ShouldQueue
@@ -74,7 +74,6 @@ final class UpdateFilmJob implements ShouldQueue
      *
      * @param  array  $data  данные фильма из внешнего источника
      * @param  string  $key  ключ поля
-     * @return array|null
      */
     private function explodeOrNull(array $data, string $key): ?array
     {

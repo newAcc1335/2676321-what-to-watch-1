@@ -22,7 +22,7 @@ class FilmFactory extends Factory
             'is_promo' => false,
             'rating' => null,
             'scores_count' => 0,
-            'imdb_id' => 'tt'.$this->faker->unique()->numerify('#######'),
+            'imdb_id' => 'tt' . $this->faker->unique()->numerify('#######'),
         ];
     }
 }

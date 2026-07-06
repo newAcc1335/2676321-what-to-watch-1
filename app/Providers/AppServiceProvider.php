@@ -8,15 +8,15 @@ use App\Models\User;
 use App\Repositories\OmdbRepository;
 use GuzzleHttp\Psr7\HttpFactory;
 use Http\Adapter\Guzzle7\Client;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\ServiceProvider;
 
 final class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Регистрирует привязку репозитория внешнего источника данных
      */
     #[\Override]
     public function register(): void
@@ -35,7 +35,7 @@ final class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Регистрирует лимитер обращений к OMDb API и правила доступа к комментариям
      */
     public function boot(): void
     {

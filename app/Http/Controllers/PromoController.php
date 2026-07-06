@@ -25,11 +25,10 @@ final class PromoController extends Controller
     /**
      * Установка промо-фильма.
      *
-     * Endpoint: POST /api/promo/{id}
+     * Endpoint: POST /api/promo/{film}
      */
-    public function store(int $id): SuccessResponse
+    public function store(Film $film): SuccessResponse
     {
-        $film = Film::findOrFail($id);
         Film::where('is_promo', true)->update(['is_promo' => false]);
         $film->update(['is_promo' => true]);
 

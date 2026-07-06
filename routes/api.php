@@ -16,16 +16,16 @@ Route::get('/films', [FilmController::class, 'index']);
 Route::get('/films/{film}', [FilmController::class, 'show']);
 Route::get('/films/{film}/similar', [FilmController::class, 'similar']);
 
-Route::get('/comments/{id}', [CommentController::class, 'index']);
+Route::get('/comments/{film}', [CommentController::class, 'index']);
 Route::get('/genres', [GenreController::class, 'index']);
 Route::get('/promo', [PromoController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/favorite', [FavoriteController::class, 'index']);
-    Route::post('/films/{id}/favorite', [FavoriteController::class, 'store']);
-    Route::delete('/films/{id}/favorite', [FavoriteController::class, 'destroy']);
+    Route::post('/films/{film}/favorite', [FavoriteController::class, 'store']);
+    Route::delete('/films/{film}/favorite', [FavoriteController::class, 'destroy']);
 
-    Route::post('/comments/{id}', [CommentController::class, 'store']);
+    Route::post('/comments/{film}', [CommentController::class, 'store']);
     Route::patch('/comments/{comment}', [CommentController::class, 'update']);
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
 
@@ -41,5 +41,5 @@ Route::middleware(['auth:sanctum', 'role:isModerator'])->group(function () {
 
     Route::patch('/genres/{genre}', [GenreController::class, 'update']);
 
-    Route::post('/promo/{id}', [PromoController::class, 'store']);
+    Route::post('/promo/{film}', [PromoController::class, 'store']);
 });
