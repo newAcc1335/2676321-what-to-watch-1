@@ -6,7 +6,7 @@ use App\Http\Responses\SuccessResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class UserController extends Controller
+final class UserController extends Controller
 {
     /**
      * Получение профиля пользователя.
@@ -37,7 +37,7 @@ class UserController extends Controller
         $user->update($request->only(['name', 'email', 'password']));
 
         if ($request->hasFile('file')) {
-            if ($user->avatar) {
+            if ($user->avatar !== null) {
                 Storage::disk('public')->delete($user->avatar);
             }
             $path = $request->file('file')->store('avatars', 'public');

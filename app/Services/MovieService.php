@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Contracts\MovieRepositoryInterface;
 
-class MovieService
+final class MovieService
 {
     public function __construct(private readonly MovieRepositoryInterface $movieRepository)
     {

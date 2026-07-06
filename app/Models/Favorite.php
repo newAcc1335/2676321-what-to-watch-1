@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Favorite extends Model
+final class Favorite extends Model
 {
     protected $fillable = ['user_id', 'film_id'];
 

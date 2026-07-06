@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Contracts\MovieRepositoryInterface;
 use App\Jobs\UpdateFilmJob;
 use App\Models\Film;
 use App\Services\GenreService;
@@ -34,8 +35,8 @@ class UpdateFilmJobTest extends TestCase
             'Poster' => 'https://example.com/poster.jpg',
         ];
 
-        $this->mock(MovieService::class, function (MockInterface $mock) use ($movieData) {
-            $mock->shouldReceive('getMovieInfo')
+        $this->mock(MovieRepositoryInterface::class, function (MockInterface $mock) use ($movieData) {
+            $mock->shouldReceive('findByImdbId')
                 ->with('tt1109624')
                 ->andReturn($movieData);
         });

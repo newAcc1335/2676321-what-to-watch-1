@@ -5,7 +5,7 @@ namespace App\Http\Responses;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Symfony\Component\HttpFoundation\Response;
 
-class SuccessResponse extends BaseResponse
+final class SuccessResponse extends BaseResponse
 {
     public function __construct(
         mixed $data = [],

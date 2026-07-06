@@ -12,7 +12,7 @@ use App\Services\GenreService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 
-class FilmController extends Controller
+final class FilmController extends Controller
 {
     public function __construct(private readonly GenreService $genreService)
     {
@@ -43,7 +43,7 @@ class FilmController extends Controller
         $films = Cache::remember($cacheKey, 3600, function () use ($genre, $orderBy, $orderTo, $status) {
             $query = Film::query()->where('status', $status);
 
-            if ($genre) {
+            if ($genre !== null) {
                 $query->whereHas('genres', fn ($q) => $q->where('name', $genre));
             }
 

@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Rules\ImdbIdRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreFilmRequest extends FormRequest
+final class StoreFilmRequest extends FormRequest
 {
     /**
      * Авторизует запрос

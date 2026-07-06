@@ -6,7 +6,7 @@ use App\Http\Responses\SuccessResponse;
 use App\Models\Film;
 use Illuminate\Support\Facades\Cache;
 
-class PromoController extends Controller
+final class PromoController extends Controller
 {
     /**
      * Получение текущего промо-фильма.

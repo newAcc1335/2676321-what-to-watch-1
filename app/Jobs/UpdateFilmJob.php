@@ -9,7 +9,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use App\Services\GenreService;
 use Illuminate\Queue\Middleware\RateLimited;
 
-class UpdateFilmJob implements ShouldQueue
+final class UpdateFilmJob implements ShouldQueue
 {
     use Queueable;
 
@@ -27,7 +27,7 @@ class UpdateFilmJob implements ShouldQueue
     {
         $data = $movieService->getMovieInfo($this->imdbId);
 
-        if (! $data || $data['Response'] === 'False') {
+        if ($data === null || $data['Response'] === 'False') {
             return;
         }
 

@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Genre;
 
-class GenreService
+final class GenreService
 {
     /**
      * Находит или создаёт жанры по именам и возвращает их id

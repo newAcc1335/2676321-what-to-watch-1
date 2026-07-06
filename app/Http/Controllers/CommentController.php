@@ -8,7 +8,7 @@ use App\Models\Film;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class CommentController extends Controller
+final class CommentController extends Controller
 {
     /**
      * Получение списка комментариев к данному фильму.

@@ -4,7 +4,7 @@ namespace App\Http\Responses;
 
 use Symfony\Component\HttpFoundation\Response;
 
-class ErrorResponse extends BaseResponse
+final class ErrorResponse extends BaseResponse
 {
     public function __construct(
         protected ?string $message = null,

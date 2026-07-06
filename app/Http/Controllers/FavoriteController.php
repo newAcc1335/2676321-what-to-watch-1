@@ -6,7 +6,7 @@ use App\Http\Responses\SuccessResponse;
 use App\Models\Film;
 use Illuminate\Http\Request;
 
-class FavoriteController extends Controller
+final class FavoriteController extends Controller
 {
     /**
      * Получение списка избранных фильмов пользователя.

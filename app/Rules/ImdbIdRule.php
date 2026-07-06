@@ -5,7 +5,7 @@ namespace App\Rules;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-class ImdbIdRule implements ValidationRule
+final class ImdbIdRule implements ValidationRule
 {
     /**
      * Проверяет, что значение соответствует формату IMDB ID (ttXXXXXXX).

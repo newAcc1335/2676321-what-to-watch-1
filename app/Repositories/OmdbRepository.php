@@ -7,7 +7,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 
-class OmdbRepository implements MovieRepositoryInterface
+final class OmdbRepository implements MovieRepositoryInterface
 {
     public function __construct(
         private readonly ClientInterface $httpClient,

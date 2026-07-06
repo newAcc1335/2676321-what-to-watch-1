@@ -6,7 +6,7 @@ use App\Http\Responses\SuccessResponse;
 use App\Models\Genre;
 use Illuminate\Http\Request;
 
-class GenreController extends Controller
+final class GenreController extends Controller
 {
     /**
      * Получение списка всех жанров.

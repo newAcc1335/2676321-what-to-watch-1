@@ -7,7 +7,7 @@ use App\Rules\ImdbIdRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateFilmRequest extends FormRequest
+final class UpdateFilmRequest extends FormRequest
 {
     /**
      * Авторизует запрос

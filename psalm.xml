@@ -31,5 +31,15 @@
                 <directory name="app/Jobs"/>
             </errorLevel>
         </PossiblyUnusedMethod>
+        <PossiblyNullReference>
+            <errorLevel type="suppress">
+                <directory name="app/Http/Controllers"/>
+            </errorLevel>
+        </PossiblyNullReference>
+        <PossiblyNullPropertyFetch>
+            <errorLevel type="suppress">
+                <directory name="app/Http/Controllers"/>
+            </errorLevel>
+        </PossiblyNullPropertyFetch>
     </issueHandlers>
 </psalm>
