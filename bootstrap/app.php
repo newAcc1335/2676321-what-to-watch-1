@@ -9,6 +9,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -75,6 +76,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 $request,
                 'Запрашиваемая страница не существует.',
                 404
+            )
+        );
+
+        $exceptions->render(
+            fn (AccessDeniedHttpException $e, Request $request) => $renderApiError(
+                $request,
+                'Недостаточно прав для выполнения действия.',
+                403
             )
         );
 
