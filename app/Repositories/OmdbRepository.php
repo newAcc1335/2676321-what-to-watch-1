@@ -9,12 +9,11 @@ use Psr\Http\Message\RequestFactoryInterface;
 
 class OmdbRepository implements MovieRepositoryInterface
 {
-    private const string API_URL = 'https://www.omdbapi.com/';
-
     public function __construct(
         private readonly ClientInterface $httpClient,
         private readonly RequestFactoryInterface $requestFactory,
         private readonly string $apiKey,
+        private readonly string $apiUrl,
     ) {
     }
 
@@ -29,7 +28,7 @@ class OmdbRepository implements MovieRepositoryInterface
     #[\Override]
     public function findByImdbId(string $imdbId): ?array
     {
-        $url = self::API_URL . '?apikey=' . $this->apiKey . '&i=' . $imdbId;
+        $url = $this->apiUrl . '?apikey=' . $this->apiKey . '&i=' . $imdbId;
 
         $request = $this->requestFactory->createRequest('GET', $url);
         $response = $this->httpClient->sendRequest($request);

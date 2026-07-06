@@ -29,6 +29,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . (string) $request->user()->id,
             'password' => 'sometimes|string|min:8',
+            'file' => 'nullable|image|max:10240',
         ]);
 
         $user = $request->user();

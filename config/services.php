@@ -15,6 +15,8 @@ return [
     */
     'omdb' => [
         'key' => env('OMDB_API_KEY'),
+        'rate_limit' => (int) env('OMDB_RATE_LIMIT', 10),
+        'url' => env('OMDB_API_URL', 'https://www.omdbapi.com/'),
     ],
 
     'postmark' => [

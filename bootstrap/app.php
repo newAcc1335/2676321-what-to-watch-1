@@ -2,12 +2,16 @@
 
 use App\Http\Middleware\CheckRole;
 use App\Http\Responses\ErrorResponse;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -26,23 +30,37 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*'),
         );
 
-        $exceptions->render(function (ValidationException $e, Request $request) {
-            if ($request->is('api/*')) {
-                return new ErrorResponse(
-                    'Переданные данные не корректны.',
-                    $e->errors(),
-                    422
-                );
-            }
-        });
+        /**
+         * Формирует JSON-ошибку для API-запросов, для остальных возвращает null
+         * (null означает передачу обработки стандартному механизму Laravel).
+         */
+        $renderApiError = function (Request $request, string $message, int $status, array $errors = []): ?ErrorResponse {
+            return $request->is('api/*')
+                ? new ErrorResponse($message, $errors, $status)
+                : null;
+        };
 
-        $exceptions->render(function (HttpException $e, Request $request) {
-            if ($request->is('api/*')) {
-                return new ErrorResponse(
-                    $e->getMessage(),
-                    [],
-                    $e->getStatusCode()
-                );
-            }
-        });
+        $exceptions->render(
+            fn (ValidationException $e, Request $request) => $renderApiError($request, 'Переданные данные не корректны.', 422, $e->errors())
+        );
+
+        $exceptions->render(
+            fn (AuthenticationException $e, Request $request) => $renderApiError($request, 'Запрос требует аутентификации.', 401)
+        );
+
+        $exceptions->render(
+            fn (AuthorizationException $e, Request $request) => $renderApiError($request, 'Недостаточно прав для выполнения действия.', 403)
+        );
+
+        $exceptions->render(
+            fn (NotFoundHttpException $e, Request $request) => $renderApiError($request, 'Запрашиваемая страница не существует.', 404)
+        );
+
+        $exceptions->render(
+            fn (MethodNotAllowedHttpException $e, Request $request) => $renderApiError($request, 'Метод не поддерживается для данного роута.', 405)
+        );
+
+        $exceptions->render(
+            fn (HttpException $e, Request $request) => $renderApiError($request, $e->getMessage(), $e->getStatusCode())
+        );
     })->create();

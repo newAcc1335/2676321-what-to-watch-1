@@ -68,4 +68,20 @@ class PromoApiTest extends TestCase
         $this->assertDatabaseHas('films', ['id' => $film1->id, 'is_promo' => false]);
         $this->assertDatabaseHas('films', ['id' => $film2->id, 'is_promo' => true]);
     }
+
+    public function test_promo_cache_is_invalidated_after_film_update(): void
+    {
+        $film = Film::factory()->create(['name' => 'Old Name', 'is_promo' => true]);
+        $moderator = User::factory()->create(['role' => 'moderator']);
+
+        $this->getJson('/api/promo')->assertJsonPath('data.name', 'Old Name');
+
+        $this->actingAs($moderator)->patchJson("/api/films/{$film->id}", [
+            'name' => 'New Name',
+            'imdb_id' => $film->imdb_id,
+            'status' => 'ready',
+        ]);
+
+        $this->getJson('/api/promo')->assertJsonPath('data.name', 'New Name');
+    }
 }

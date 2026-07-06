@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FilmListRequest;
+use App\Http\Requests\StoreFilmRequest;
+use App\Http\Requests\UpdateFilmRequest;
 use App\Http\Responses\SuccessResponse;
 use App\Jobs\UpdateFilmJob;
 use App\Models\Film;
-use App\Rules\ImdbIdRule;
 use App\Services\GenreService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Request;
 
 class FilmController extends Controller
 {
@@ -21,17 +23,25 @@ class FilmController extends Controller
      *
      * Endpoint: GET /api/films
      */
-    public function index(Request $request): SuccessResponse
+    public function index(FilmListRequest $request): SuccessResponse
     {
-        $genre = $request->input('genre');
-        $orderBy = $request->input('order_by', 'released');
-        $orderTo = $request->input('order_to', 'desc');
-        $page = $request->input('page', 1);
+        $genre = $request->validated('genre');
+        $orderBy = $request->validated('order_by', 'released');
+        $orderTo = $request->validated('order_to', 'desc');
+        $page = $request->validated('page', 1);
+        $status = 'ready';
 
-        $cacheKey = "films_{$genre}_{$orderBy}_{$orderTo}_{$page}";
+        $user = $request->user('sanctum');
 
-        $films = Cache::remember($cacheKey, 3600, function () use ($genre, $orderBy, $orderTo) {
-            $query = Film::query()->where('status', 'ready');
+        if ($user !== null && $user->isModerator()) {
+            $status = $request->validated('status', 'ready');
+        }
+
+        $version = Cache::get('films_cache_version', 1);
+        $cacheKey = "films_v{$version}_{$status}_{$genre}_{$orderBy}_{$orderTo}_{$page}";
+
+        $films = Cache::remember($cacheKey, 3600, function () use ($genre, $orderBy, $orderTo, $status) {
+            $query = Film::query()->where('status', $status);
 
             if ($genre) {
                 $query->whereHas('genres', fn ($q) => $q->where('name', $genre));
@@ -50,16 +60,18 @@ class FilmController extends Controller
      *
      * Endpoint: GET /api/films/{id}
      */
-    public function show(Request $request, int $filmId): SuccessResponse
+    public function show(Request $request, Film $film): SuccessResponse
     {
-        $film = Film::with('genres')->findOrFail($filmId);
+        $film->load('genres');
 
         $data = $film->toArray();
 
-        if ($request->user()) {
-            $data['is_favorite'] = $request->user()
+        $user = $request->user('sanctum');
+
+        if ($user !== null) {
+            $data['is_favorite'] = $user
                 ->favoriteFilms()
-                ->where('film_id', $filmId)
+                ->where('film_id', $film->id)
                 ->exists();
         }
 
@@ -71,20 +83,27 @@ class FilmController extends Controller
      *
      * Endpoint: POST /api/films
      */
-    public function store(Request $request): SuccessResponse
+    public function store(StoreFilmRequest $request): SuccessResponse
     {
-        $request->validate([
-            'imdb_id' => ['required', 'unique:films,imdb_id', new ImdbIdRule()],
-        ]);
-
         $film = Film::create([
-            'imdb_id' => $request->imdb_id,
+            'imdb_id' => $request->validated('imdb_id'),
             'status' => 'pending',
         ]);
 
         UpdateFilmJob::dispatch($film->imdb_id);
+        $this->invalidateFilmsCache();
 
         return new SuccessResponse($film, 201);
+    }
+
+    /**
+     * Инвалидирует кэш списков фильмов, увеличивая версию
+     */
+    private function invalidateFilmsCache(): void
+    {
+        Cache::add('films_cache_version', 1);
+        Cache::increment('films_cache_version');
+        Cache::forget('promo_film');
     }
 
     /**
@@ -92,28 +111,16 @@ class FilmController extends Controller
      *
      * Endpoint: PATCH /api/films/{id}
      */
-    public function update(Request $request, int $filmId): SuccessResponse
+    public function update(UpdateFilmRequest $request, Film $film): SuccessResponse
     {
-        $film = Film::findOrFail($filmId);
-
-        $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'description' => 'sometimes|string|max:1000',
-            'director' => 'sometimes|array',
-            'starring' => 'sometimes|array',
-            'genre' => 'sometimes|array',
-            'run_time' => 'sometimes|integer',
-            'released' => 'sometimes|integer',
-            'status' => 'sometimes|in:pending,moderate,ready',
-            'is_promo' => 'sometimes|boolean',
-        ]);
-
-        $film->update($request->except('genre'));
+        $film->update($request->safe()->except('genre'));
 
         if ($request->has('genre')) {
-            $genreIds = $this->genreService->findOrCreateByNames($request->input('genre', []));
+            $genreIds = $this->genreService->findOrCreateByNames($request->validated('genre', []));
             $film->genres()->sync($genreIds);
         }
+
+        $this->invalidateFilmsCache();
 
         return new SuccessResponse($film);
     }
@@ -123,13 +130,13 @@ class FilmController extends Controller
      *
      * Endpoint: GET /api/films/{id}/similar
      */
-    public function similar(int $filmId): SuccessResponse
+    public function similar(Film $film): SuccessResponse
     {
-        $film = Film::with('genres')->findOrFail($filmId);
+        $film->load('genres');
 
         $genreIds = $film->genres->pluck('id');
 
-        $similar = Film::where('id', '!=', $filmId)
+        $similar = Film::where('id', '!=', $film->id)
             ->where('status', 'ready')
             ->whereHas('genres', fn ($q) => $q->whereIn('genres.id', $genreIds))
             ->limit(4)

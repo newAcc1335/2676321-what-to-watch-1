@@ -10,6 +10,8 @@ use GuzzleHttp\Psr7\HttpFactory;
 use Http\Adapter\Guzzle7\Client;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,7 +28,8 @@ class AppServiceProvider extends ServiceProvider
             return new OmdbRepository(
                 $client,
                 $requestFactory,
-                config('services.omdb.key')
+                config('services.omdb.key'),
+                config('services.omdb.url')
             );
         });
     }
@@ -36,6 +39,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        RateLimiter::for('omdb', function (): Limit {
+            return Limit::perMinute(config('services.omdb.rate_limit'));
+        });
+
         Gate::define('update-comment', function (User $user, Comment $comment) {
             return $user->isModerator() || $user->id === $comment->user_id;
         });

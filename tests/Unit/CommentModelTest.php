@@ -21,11 +21,11 @@ class CommentModelTest extends TestCase
         $this->assertEquals('Saint Pavlusha', $authorName);
     }
 
-    public function test_anonymous_comment_returns_incognito(): void
+    public function test_anonymous_comment_returns_guest(): void
     {
         $comment = Comment::factory()->create(['user_id' => null]);
         $authorName = $comment->author_name;
 
-        $this->assertEquals('incognito', $authorName);
+        $this->assertEquals('Гость', $authorName);
     }
 }

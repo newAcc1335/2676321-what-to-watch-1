@@ -28,6 +28,7 @@
             <errorLevel type="suppress">
                 <directory name="app/Models"/>
                 <directory name="app/Services"/>
+                <directory name="app/Jobs"/>
             </errorLevel>
         </PossiblyUnusedMethod>
     </issueHandlers>

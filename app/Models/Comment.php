@@ -37,9 +37,9 @@ class Comment extends Model
         return $this->hasMany(Comment::class, 'comment_id');
     }
 
-    /** Возвращает имя автора или 'incognito' для анонимных комментариев */
+    /** Возвращает имя автора или 'Гость' для анонимных комментариев */
     protected function getAuthorNameAttribute(): string
     {
-        return $this->user?->name ?? 'incognito';
+        return $this->user?->name ?? 'Гость';
     }
 }

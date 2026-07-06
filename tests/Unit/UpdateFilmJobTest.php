@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Jobs\UpdateFilmJob;
 use App\Models\Film;
+use App\Services\GenreService;
 use App\Services\MovieService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -29,6 +30,8 @@ class UpdateFilmJobTest extends TestCase
             'Actors' => 'Sandra Bullock, Ryan Reynolds',
             'Year' => '2009',
             'Runtime' => '108 min',
+            'Genre' => 'Comedy, Romance',
+            'Poster' => 'https://example.com/poster.jpg',
         ];
 
         $this->mock(MovieService::class, function (MockInterface $mock) use ($movieData) {
@@ -37,12 +40,15 @@ class UpdateFilmJobTest extends TestCase
                 ->andReturn($movieData);
         });
 
-        (new UpdateFilmJob('tt1109624'))->handle(app(MovieService::class));
-
+        (new UpdateFilmJob('tt1109624'))->handle(app(MovieService::class), app(GenreService::class));
         $film->refresh();
         $this->assertEquals('The Proposal', $film->name);
         $this->assertEquals(2009, $film->released);
         $this->assertEquals('moderate', $film->status);
+        $this->assertEquals('https://example.com/poster.jpg', $film->poster_image);
+        $this->assertDatabaseHas('genres', ['name' => 'Comedy']);
+        $this->assertDatabaseHas('genres', ['name' => 'Romance']);
+        $this->assertCount(2, $film->genres);
     }
 
     public function test_job_is_dispatched_to_queue(): void

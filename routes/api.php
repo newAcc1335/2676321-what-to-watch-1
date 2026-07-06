@@ -13,8 +13,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/films', [FilmController::class, 'index']);
-Route::get('/films/{id}', [FilmController::class, 'show']);
-Route::get('/films/{id}/similar', [FilmController::class, 'similar']);
+Route::get('/films/{film}', [FilmController::class, 'show']);
+Route::get('/films/{film}/similar', [FilmController::class, 'similar']);
 
 Route::get('/comments/{id}', [CommentController::class, 'index']);
 Route::get('/genres', [GenreController::class, 'index']);
@@ -37,7 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::middleware(['auth:sanctum', 'role:isModerator'])->group(function () {
     Route::post('/films', [FilmController::class, 'store']);
-    Route::patch('/films/{id}', [FilmController::class, 'update']);
+    Route::patch('/films/{film}', [FilmController::class, 'update']);
 
     Route::patch('/genres/{genre}', [GenreController::class, 'update']);
 

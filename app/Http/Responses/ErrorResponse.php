@@ -20,9 +20,14 @@ class ErrorResponse extends BaseResponse
     #[\Override]
     protected function payload(): ?array
     {
-        return [
-            'message' => $this->message,
-            'errors' => $this->toArray(),
-        ];
+        $payload = ['message' => $this->message];
+
+        $errors = $this->toArray();
+
+        if ($errors !== []) {
+            $payload['errors'] = $errors;
+        }
+
+        return $payload;
     }
 }

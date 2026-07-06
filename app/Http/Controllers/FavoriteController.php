@@ -15,7 +15,7 @@ class FavoriteController extends Controller
      */
     public function index(Request $request): SuccessResponse
     {
-        $films = $request->user()->favoriteFilms()->latest('favorites.created_at')->get();
+        $films = $request->user()->favoriteFilms()->latest('favorites.created_at')->paginate(8);
 
         return new SuccessResponse($films);
     }
